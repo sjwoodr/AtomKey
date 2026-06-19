@@ -1,6 +1,6 @@
 // AtomKey - a WinKey-protocol-compatible CW keyer for the M5Stack Atom Lite.
 //
-// Purpose: a ~$10 bench device that speaks enough of the K1EL WinKey host
+// Purpose: a cheap bench device that speaks enough of the K1EL WinKey host
 // protocol for a logging program (e.g. ContestLogX's WinKeyerClient) to talk
 // to it as if it were a real WinKeyer. Element timing is generated on the
 // ESP32, not the host PC, which is the whole point of offloading CW keying.

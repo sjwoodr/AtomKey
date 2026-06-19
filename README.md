@@ -5,8 +5,8 @@ A WinKey-protocol-compatible CW keyer running on an **M5Stack Atom Lite**
 WinKey host protocol that a logging program can drive it like a real WinKeyer
 — but element timing is generated on the ESP32, not on the host PC.
 
-This is a ~$10 bench device, primarily for developing and testing the
-`WinKeyerClient` backend in [ContestLogX](../ContestLogX). The two projects
+This is a cheap bench device, primarily for developing and testing the
+`WinKeyerClient` backend in [ContestLogX](https://github.com/sjwoodr/ContestLogX). The two projects
 meet only at the WinKey serial protocol: AtomKey has no dependency on CLX, and
 CLX cannot tell AtomKey apart from a genuine K1EL WinKeyer.
 
@@ -100,3 +100,7 @@ WiFi/Bluetooth are never started, so nothing competes with the keying loop.
 Timing currently uses `millis()`, which is fine for a bench device; for
 production-grade jitter at high WPM, move element timing to a hardware timer
 pinned to core 1.
+
+## License
+
+[MIT](LICENSE)
