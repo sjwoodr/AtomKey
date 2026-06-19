@@ -51,6 +51,16 @@ pio run -t upload
 pio device monitor
 ```
 
+> **Set your serial port before flashing.** `platformio.ini` pins
+> `upload_port` / `monitor_port` to `/dev/ttyUSB1`, which is just the author's
+> machine — **you must change these to match your own port.** Run
+> `pio device list` to find it. Note the Atom Lite enumerates as an FTDI
+> FT232R (VID:PID `0403:6001`, description `M5stack`), the same chip family as
+> some rig CAT cables, so auto-detect can pick the wrong port — pinning it
+> explicitly avoids flashing the wrong device. For a binding that survives
+> reboots/replugs, point them at the stable symlink under
+> `/dev/serial/by-id/` instead of `/dev/ttyUSBn`.
+
 On **Linux** the USB-UART chip is usually in-kernel and shows up as
 `/dev/ttyACM0` or `/dev/ttyUSB0`. If you get a permission error, add yourself to
 the `dialout` group and re-login:
