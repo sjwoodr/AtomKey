@@ -1,0 +1,3 @@
+# Dependencies for the AtomKey serial test tools (wktest.py).
+# Install with:  python3 -m pip install -r tools/requirements.txt
+pyserial>=3.5
