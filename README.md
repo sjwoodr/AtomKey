@@ -94,6 +94,8 @@ speed pot, buffered commands, paddle input.
 - **M3** — robustness: fuller status semantics, weighting, PTT timing.
 - **M4** — paddle input + sidetone config.
 
+See [TODO.md](TODO.md) for the tasked-out M3/M4 backlog.
+
 ## Notes
 
 WiFi/Bluetooth are never started, so nothing competes with the keying loop.
