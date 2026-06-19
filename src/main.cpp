@@ -20,6 +20,7 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
+#include <esp_log.h>
 
 // ----------------------------------------------------------------------------
 // Pin map (Atom Lite)
@@ -53,14 +54,46 @@ static void setLed(const CRGB &c) {
 // ----------------------------------------------------------------------------
 static bool g_hostOpen = false;
 
+// Sidetone via the ESP32 LEDC peripheral. Arduino's tone() on some core
+// versions does not attach the pin first, so it errors ("LEDC is not
+// initialized") and the ESP-IDF logger dumps that text onto UART0 — the same
+// line carrying the WinKey protocol — corrupting the byte stream for the host.
+// Drive LEDC directly instead, guarding for the 2.x/3.x API change.
+#define SIDETONE_LEDC_CH 0
+
+static void sidetoneInit() {
+#if ESP_ARDUINO_VERSION_MAJOR >= 3
+  ledcAttach(SIDETONE_PIN, SIDETONE_HZ, 10);
+#else
+  ledcSetup(SIDETONE_LEDC_CH, SIDETONE_HZ, 10);
+  ledcAttachPin(SIDETONE_PIN, SIDETONE_LEDC_CH);
+#endif
+}
+
+static void sidetoneOn() {
+#if ESP_ARDUINO_VERSION_MAJOR >= 3
+  ledcWriteTone(SIDETONE_PIN, SIDETONE_HZ);
+#else
+  ledcWriteTone(SIDETONE_LEDC_CH, SIDETONE_HZ);
+#endif
+}
+
+static void sidetoneOff() {
+#if ESP_ARDUINO_VERSION_MAJOR >= 3
+  ledcWriteTone(SIDETONE_PIN, 0);
+#else
+  ledcWriteTone(SIDETONE_LEDC_CH, 0);
+#endif
+}
+
 static void keyDown() {
-  tone(SIDETONE_PIN, SIDETONE_HZ);
+  sidetoneOn();
   digitalWrite(KEY_OUT_PIN, HIGH);
   setLed(COLOR_KEYDOWN);
 }
 
 static void keyUp() {
-  noTone(SIDETONE_PIN);
+  sidetoneOff();
   digitalWrite(KEY_OUT_PIN, LOW);
   setLed(g_hostOpen ? COLOR_IDLE : COLOR_BOOT);
 }
@@ -312,9 +345,15 @@ static void serviceButton() {
 
 // ----------------------------------------------------------------------------
 void setup() {
+  // Silence ESP-IDF logging: it shares UART0 with the WinKey protocol, and any
+  // stray log text corrupts the byte stream a host (CLX, QLog, ...) parses.
+  esp_log_level_set("*", ESP_LOG_NONE);
+
   pinMode(KEY_OUT_PIN, OUTPUT);
   digitalWrite(KEY_OUT_PIN, LOW);
   pinMode(BTN_PIN, INPUT);
+
+  sidetoneInit();
 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, LED_COUNT);
   FastLED.setBrightness(40);
