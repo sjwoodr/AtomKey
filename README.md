@@ -77,13 +77,24 @@ sudo usermod -aG dialout $USER
 Implemented:
 - Host open (`00 02`) → returns firmware revision (`0x17`, WK2 v2.3)
 - Host close (`00 03`), reset (`00 01`), echo test (`00 04`)
-- Set WPM (`02 <wpm>`), clear buffer / abort (`0A`), status request (`15`)
+- Set WPM (`02`), clear/abort (`0A`), status request (`15`)
 - Printable ASCII (`>= 0x20`) queued and sent as Morse
-- Busy/idle status byte emitted on transitions
-- Parameter-length table for `0x01..0x1F` so unimplemented commands stay in sync
+- **Weighting** (`03`), **dit/dah ratio** (`17`), **Farnsworth** (`0D`),
+  **key compensation** (`11`) — full element-timing model
+- **Sidetone pitch + paddle-only mute** (`01`)
+- **PTT lead-in / tail** (`04`) sequenced on GPIO 25
+- **Pause** (`06`), **key-immediate / tune** (`0B`), **backspace** (`08`)
+- **Mode register** (`0E`): contest word-spacing + serial echo
+- **Prosign merge** (`1B`) — concatenated chars, no inter-char gap
+- **Load defaults** (`0F`, 15-byte block)
+- Status byte with **busy + XOFF backpressure**, emitted on every edge
+- Parameter-length table for `0x01..0x1F` (verified vs. WK2 datasheet v23) so
+  unimplemented commands stay in sync
 
-Not yet (consumed and ignored): sidetone/weighting/pin config, PTT lead-tail,
-speed pot, buffered commands, paddle input.
+Not yet (consumed and ignored): speed pot (`05`/`07`, no pot on Atom Lite),
+pin config (`09`), first extension (`10`, stored), paddle switchpoint (`12`),
+the buffered family (`18`–`1F` except merge), paddle input. Mode bits for
+paddle keying (iambic/ultimatic/swap/watchdog) are stored for M4.
 
 ## Milestones
 

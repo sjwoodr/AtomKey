@@ -20,33 +20,44 @@ is in `src/main.cpp`.
 
 These are mostly host-driven and bench-verifiable (LED/buzzer/scope).
 
-- [ ] **Weighting** (`0x03`) — adjust dit/space ratio; currently fixed at PARIS.
-- [ ] **Dit/dah ratio** (`0x17`) — non-3:1 ratios some ops prefer.
-- [ ] **PTT lead-in / tail timing** (`0x04`) — drive the PTT output pin: assert
-      PTT, wait lead-in, then key; hold PTT through the tail after the last
-      element. Needed for amp/QSK sequencing. (Define a `PTT_OUT_PIN`.)
-- [ ] **Buffered speed change** (`+`/`-` and the buffered-speed command in the
-      `0x18`–`0x1F` range) — change WPM mid-message without flushing the buffer.
-- [ ] **Buffered PTT / timed key-down** (`0x19`–`0x1F` family) — for inserting
-      tuning carriers / spacing in a message stream.
-- [ ] **Pause** (`0x06`) and **key-immediate** (`0x0B`) — stop/resume sending;
-      assert a continuous key-down (tune).
-- [ ] **Backspace** (`0x08`) — remove the last char still in the send buffer.
-- [ ] **Fuller status byte semantics** — currently only busy/idle (`0xC4`/`0xC0`).
-      Add XOFF / buffer-full backpressure so the host throttles, plus the
-      breakin and pushbutton status bits per the datasheet.
-- [ ] **Serial echo mode** — echo each character back as it is keyed (some
-      hosts display sent text from the echo stream).
-- [ ] **WinKey mode register** (`0x0E`) — honor autospace, contest (word)
-      spacing, paddle-watchdog, key-mode bits.
-- [ ] **Farnsworth spacing** (`0x0D`).
-- [ ] **Sidetone control** (`0x01`) — enable/disable + pitch from the host
-      (right now pitch is the hardcoded `SIDETONE_HZ`).
-- [ ] **Pin config** (`0x09`), **first extension** (`0x10`), **key compensation**
-      (`0x11`) — honor or explicitly no-op with a comment.
-- [ ] **Load defaults** (`0x0F`, 15 bytes) — apply the standard parameter block.
-- [ ] **Prosign / merged-letter support** — send concatenated characters with
-      no inter-char gap (e.g. AR, SK, BT).
+- [x] **Weighting** (`0x03`) — adjust dit/space ratio; 10–90, 50 = normal.
+- [x] **Dit/dah ratio** (`0x17`) — 33–66, dah/dit = 3·(n/50).
+- [x] **PTT lead-in / tail timing** (`0x04`) — drives `PTT_OUT_PIN` (GPIO 25):
+      asserts PTT, waits lead-in, keys, then holds PTT for 3 dits + tail after
+      the last element. Lead/tail bytes are 10 ms units.
+- [ ] **Buffered speed change** (the buffered-speed command in the `0x1C`/`0x1E`
+      range) — change WPM mid-message without flushing the buffer. *(Not the
+      `+`/`-` chars — those are prosigns AR/DU, not speed steps; see TODO note.)*
+- [ ] **Buffered PTT / timed key-down** (`0x18`/`0x19`/`0x1A` family) — for
+      inserting tuning carriers / spacing in a message stream. *(Param counts
+      now correct in `PARAM_LEN`, so these stay in sync while unimplemented.
+      Timed key-down/wait is also what lights the status WAIT bit.)*
+- [ ] **Autospace** (mode `0x0E` bit 1) — insert a word space automatically;
+      host-relevant, left out of the mode-register pass above.
+- [ ] **`0x1D` dual meaning** — the WK2 datasheet lists it as both buffered HSCW
+      speed *and* port-select; WK3 resolves it as port-select. Currently
+      `PARAM_LEN = 1` (stays in sync either way); pick a meaning if ever used.
+- [x] **Pause** (`0x06`) and **key-immediate** (`0x0B`) — pause holds at the
+      next char boundary; key-immediate asserts a continuous key-down (tune).
+- [x] **Backspace** (`0x08`) — removes the last char still in the send buffer.
+- [x] **Fuller status byte semantics** — busy/idle plus XOFF (`bit 0`,
+      buffer > 2/3 full) so the host throttles, emitted on every status edge.
+      *(WAIT/BREAKIN/pushbutton bits await timed-buffered + paddle support.)*
+- [x] **Serial echo mode** — mode bit 2 echoes each char back as it is keyed.
+- [x] **WinKey mode register** (`0x0E`) — honors contest (word) spacing and
+      serial echo. Autospace (bit 1) broken out as its own item below; paddle
+      bits (swap, paddle-echo, watchdog, key-mode) stored for M4.
+- [x] **Farnsworth spacing** (`0x0D`) — elements at Farnsworth WPM, char/word
+      spacing at the (slower) main speed; auto-off when main ≥ Farnsworth.
+- [x] **Sidetone control** (`0x01`) — pitch from the host (divisor index N) plus
+      the paddle-only mute bit.
+- [x] **Key compensation** (`0x11`) — fixed ms added to every element.
+      **First extension** (`0x10`) stored (T/R timing deferred). **Pin config**
+      (`0x09`) consumed/no-op with comment.
+- [x] **Load defaults** (`0x0F`, 15 bytes) — applies the standard parameter
+      block in datasheet order (honored fields; pot/paddle bytes skipped).
+- [x] **Prosign / merged-letter support** — merge command (`0x1B`) concatenates
+      two chars with no inter-char gap (e.g. AR, SK, BT).
 
 ## M4 — Paddle input & local operation
 
