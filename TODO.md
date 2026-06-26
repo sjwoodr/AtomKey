@@ -63,8 +63,9 @@ These are mostly host-driven and bench-verifiable (LED/buzzer/scope).
 
 Requires physical paddle wiring; independent of the host-driven keying path.
 
-- [ ] **Paddle inputs** — two GPIOs (dit/dah) with debounce; define pins on the
-      Grove/header. (`KEY_OUT_PIN`/`SIDETONE_PIN` already reserved.)
+- [ ] **Paddle inputs** — two GPIOs (dit/dah) with debounce. The now-free Grove
+      port (G26, G32) is a natural home, or use spare side-header pins. (All
+      keying outputs are on the side header: G22/G23/G25.)
 - [ ] **Iambic A/B + Ultimatic** keying modes; honor the mode register.
 - [ ] **Paddle echo to host** — report paddle-sent characters so the logger can
       display them.

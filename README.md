@@ -26,14 +26,21 @@ build and test the host side without buying a WinKeyer first.
 |-----------------|----------|----------------------------------------------------|
 | RGB status LED  | GPIO 27  | Built in. Amber = key down, dim blue = idle/open.  |
 | Button          | GPIO 39  | Built in. Press = send a self-test message.        |
-| Sidetone        | GPIO 26  | Grove pin 1. Attach a **passive piezo buzzer** to GND. |
-| Key out         | GPIO 32  | Grove pin 2. Active-high; future opto/transistor to rig KEY. Safe to leave unconnected. |
+| Sidetone        | GPIO 22  | Side header. Attach a **passive piezo buzzer** to GND. |
+| Key out         | GPIO 23  | Side header. Active-high; opto/transistor to rig KEY. Safe to leave unconnected. |
+| PTT out         | GPIO 25  | Side header. Active-high; opto/transistor to rig PTT. Safe to leave unconnected. |
+
+All user-wired signals are on the **2.54 mm side headers**, so the whole build
+uses ordinary Dupont jumpers (the Grove port is left free).
 
 **No rig is needed.** For audible CW, put a passive piezo buzzer between
-GPIO 26 and GND. With nothing attached you still get visual keying on the LED.
+GPIO 22 and GND. With nothing attached you still get visual keying on the LED.
 
 > Do not key a rig directly from a 3.3 V GPIO — when you get there, put an
 > optocoupler or transistor between `KEY_OUT_PIN` and the rig's KEY line.
+
+See **[docs/wiring.md](docs/wiring.md)** for the buzzer hookup, the PC817
+optocoupler (and 2N3904) keying stage, the PTT stage, and a shopping list.
 
 ## Toolchain (PlatformIO)
 

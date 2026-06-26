@@ -8,12 +8,13 @@
 // Hardware (Atom Lite):
 //   - RGB LED (SK6812) on GPIO 27  -> visual key-down feedback + status
 //   - Button on GPIO 39 (input-only, external pull-up) -> self-test
-//   - Grove port: GPIO 26, GPIO 32 -> sidetone buzzer / future rig keying
-//   - Side header GPIO 25          -> PTT output (amp/QSK sequencing)
+//   - Side header (2.54 mm): GPIO 22 sidetone, GPIO 23 key-out, GPIO 25 PTT
 //
-// No rig required: attach a passive piezo buzzer between SIDETONE_PIN and GND
-// to hear the CW. KEY_OUT_PIN is driven too (active-high) for a future
-// optocoupler/transistor stage, but is harmless if left unconnected.
+// Everything user-wired lives on the 2.54 mm side headers, so the whole build
+// uses ordinary Dupont jumpers and the Grove port is left free. No rig
+// required: attach a passive piezo buzzer between SIDETONE_PIN and GND to hear
+// the CW. KEY_OUT_PIN and PTT_OUT_PIN are driven active-high for a future
+// optocoupler/transistor stage, but are harmless if left unconnected.
 //
 // WiFi/BT are never started, so nothing competes with the keying loop for the
 // CPU. For production-grade jitter you'd move element timing onto a hardware
@@ -29,8 +30,8 @@
 #define LED_PIN       27   // built-in SK6812
 #define LED_COUNT     1
 #define BTN_PIN       39   // built-in button (input-only, no internal pull)
-#define SIDETONE_PIN  26   // Grove pin 1 -> passive piezo buzzer
-#define KEY_OUT_PIN   32   // Grove pin 2 -> future opto/transistor to rig KEY
+#define SIDETONE_PIN  22   // side header -> passive piezo buzzer
+#define KEY_OUT_PIN   23   // side header -> opto/transistor to rig KEY (active-high)
 #define PTT_OUT_PIN   25   // side header -> PTT to amp/QSK sequencer (active-high)
 
 #define SIDETONE_HZ   700  // default sidetone pitch (host can override via 0x01)
