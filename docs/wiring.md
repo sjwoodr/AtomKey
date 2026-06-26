@@ -120,6 +120,22 @@ G23. Wire a **second PC817** (or 2N3904) the same way, with G25 driving the LED
 firmware asserts PTT before the first element (lead-in) and holds it through the
 tail after the last element.
 
+## Rig-side setup: set the key type to "straight"
+
+An external keyer (AtomKey, or any WinKeyer) sends *finished* CW on the KEY
+line - the dits and dahs are already timed. So the radio's own keyer must be
+told it's looking at a **straight key**, not a paddle/iambic input. If you leave
+the rig in iambic/paddle mode it will try to re-interpret the keying and garble
+the timing.
+
+- **Icom IC-7300:** Menu -> Set -> Connectors (CW) -> **Key Type -> Straight**.
+  (Confirmed by a tester whose WinKeyer Mini keyed correctly only after this.)
+- **Other rigs:** look for "CW key type", "keyer type", or "paddle/straight" in
+  the CW menu and set it to straight / external keyer.
+
+This applies regardless of host software - it's a property of feeding the rig
+pre-formed CW, the same reason you'd set it for a real K1EL WinKeyer.
+
 ## Shopping list
 
 - Passive piezo buzzer element
