@@ -103,6 +103,39 @@ pin config (`09`), first extension (`10`, stored), paddle switchpoint (`12`),
 the buffered family (`18`–`1F` except merge), paddle input. Mode bits for
 paddle keying (iambic/ultimatic/swap/watchdog) are stored for M4.
 
+## Testing with `wktest.py`
+
+`tools/wktest.py` is a tiny host-side poke for the keyer — it speaks the same
+WinKey conversation a logging program would. Use it to confirm a freshly
+flashed board works without wiring up a real host. Requires pyserial:
+
+```bash
+python3 -m pip install pyserial
+```
+
+**Send a message** (does the host-open handshake, sets WPM, keys text, then
+prints the status bytes the keyer emits):
+
+```bash
+# python3 tools/wktest.py [PORT] [WPM] [MESSAGE]
+python3 tools/wktest.py /dev/ttyUSB1 25 "CQ TEST DE ATOMKEY"
+```
+
+**Demo mode** (`--demo`) exercises the M3 command set in one pass — sidetone
+pitch, weighting, dit/dah ratio, PTT lead/tail, serial echo, a prosign merge,
+pause/resume, and tune — so you can watch the LED, listen to the buzzer, and
+scope the PTT pin:
+
+```bash
+python3 tools/wktest.py /dev/ttyUSB1 25 --demo
+```
+
+It prints each command as it sends it, plus the keyer's replies: status bytes
+show as hex (`C4` busy / `C0` idle) and serial-echo characters show as quoted
+chars (`'P' 'A' 'R' 'I' 'S'`). A healthy run opens with `revision 0x17` and
+ends with `done.`. Opening the port reboots the ESP32 (DTR), so the script
+waits ~2 s for boot before starting.
+
 ## Milestones
 
 - **M0** — toolchain proof: LED lights on boot. ✅
